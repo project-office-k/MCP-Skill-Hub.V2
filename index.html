@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code Hub — MCP & スキル ディレクトリ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #06080f;
+  --surface: #0c0f1e;
+  --card: #0f1228;
+  --border: rgba(80,100,200,0.12);
+  --border-hover: rgba(0,224,255,0.38);
+  --cyan: #00e0ff;
+  --cyan-dim: rgba(0,224,255,0.12);
+  --amber: #ffaa40;
+  --green: #00ff88;
+  --purple: #b070ff;
+  --red: #ff4060;
+  --text: #dde6f4;
+  --text-sub: #788299;
+  --text-dim: #3e4860;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'Noto Sans JP', sans-serif;
+  --r: 12px;
+  --ease: 0.18s cubic-bezier(0.4,0,0.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(0,224,255,0.055) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;top:-240px;left:50%;transform:translateX(-50%);width:900px;height:480px;background:radial-gradient(ellipse,rgba(20,60,255,0.07) 0%,transparent 68%);pointer-events:none;z-index:0}
+.wrap{max-width:1300px;margin:0 auto;padding:0 28px;position:relative;z-index:1}
+
+/* ── HEADER ── */
+header{padding:64px 0 44px;text-align:center;position:relative;z-index:1}
+.hbadge{display:inline-flex;align-items:center;gap:7px;background:rgba(0,224,255,0.08);border:1px solid rgba(0,224,255,0.22);border-radius:100px;padding:5px 16px;font-family:var(--mono);font-size:11px;color:var(--cyan);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:26px;animation:fid 0.55s ease}
+.hbadge::before{content:'◉';font-size:8px;animation:blink 2.4s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.25}}
+h1{font-family:var(--mono);font-size:clamp(26px,5vw,52px);font-weight:600;line-height:1.08;letter-spacing:-0.025em;margin-bottom:14px;animation:fid 0.55s ease 0.08s both}
+h1 em{font-style:normal;color:var(--cyan);text-shadow:0 0 48px rgba(0,224,255,0.35)}
+.hdesc{font-size:15px;color:var(--text-sub);max-width:480px;margin:0 auto 12px;line-height:1.78;font-weight:300;animation:fid 0.55s ease 0.15s both}
+.hstats{display:flex;gap:24px;justify-content:center;margin-bottom:36px;animation:fid 0.55s ease 0.2s both}
+.hstat{font-family:var(--mono);font-size:12px;color:var(--text-dim)}
+.hstat strong{color:var(--text-sub);font-weight:600}
+
+/* ── SEARCH ── */
+.search-wrap{max-width:560px;margin:0 auto;position:relative;animation:fid 0.55s ease 0.25s both}
+.search-wrap svg{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:var(--text-dim);pointer-events:none;flex-shrink:0}
+#searchInput{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:14px 52px 14px 50px;font-family:var(--sans);font-size:15px;color:var(--text);outline:none;transition:border-color var(--ease),box-shadow var(--ease)}
+#searchInput::placeholder{color:var(--text-dim)}
+#searchInput:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,224,255,0.12),0 0 24px rgba(0,224,255,0.08)}
+.search-clear{position:absolute;right:16px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.07);border:none;color:var(--text-dim);width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:14px;display:none;align-items:center;justify-content:center;transition:all var(--ease)}
+.search-clear:hover{background:rgba(255,80,80,0.18);color:#ff5050}
+.search-clear.visible{display:flex}
+
+/* ── FILTERS ── */
+.filters{padding:30px 0 20px;animation:fadein 0.55s ease 0.32s both}
+.frow{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:10px}
+.flabel{font-family:var(--mono);font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;padding-top:8px;min-width:52px;flex-shrink:0}
+.chips{display:flex;gap:7px;flex-wrap:wrap}
+.chip{padding:6px 14px;border-radius:100px;border:1px solid var(--border);background:transparent;color:var(--text-sub);font-family:var(--sans);font-size:13px;cursor:pointer;transition:all var(--ease);white-space:nowrap;line-height:1}
+.chip:hover{border-color:rgba(0,224,255,0.28);color:var(--text);background:rgba(0,224,255,0.05)}
+.chip.active{background:rgba(0,224,255,0.1);border-color:rgba(0,224,255,0.42);color:var(--cyan);font-weight:500}
+.chip.tmcp.active{background:rgba(0,255,136,0.09);border-color:rgba(0,255,136,0.35);color:var(--green)}
+.chip.tskill.active{background:rgba(176,112,255,0.1);border-color:rgba(176,112,255,0.35);color:var(--purple)}
+
+/* ── RESULTS BAR ── */
+.rbar{padding:14px 0 18px;display:flex;align-items:center;border-top:1px solid var(--border);margin-top:4px}
+.rcount{font-family:var(--mono);font-size:12px;color:var(--text-dim)}
+.rcount span{color:var(--cyan);font-weight:600}
+
+/* ── GRID ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;padding-bottom:100px}
+
+/* ── CARD ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px;cursor:pointer;transition:border-color var(--ease),transform var(--ease),box-shadow var(--ease);position:relative;overflow:hidden;animation:cardin 0.38s ease both}
+.card::before{content:'';position:absolute;inset:0;background:linear-gradient(130deg,rgba(0,224,255,0.04) 0%,transparent 55%);opacity:0;transition:opacity var(--ease)}
+.card:hover{border-color:var(--border-hover);transform:translateY(-2px);box-shadow:0 10px 36px rgba(0,0,0,0.42),0 0 0 1px rgba(0,224,255,0.08)}
+.card:hover::before{opacity:1}
+@keyframes cardin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+.card-icon{font-size:28px;line-height:1;flex-shrink:0}
+.card-badges{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.badge{font-family:var(--mono);font-size:10px;font-weight:500;padding:3px 8px;border-radius:4px;letter-spacing:0.05em;text-transform:uppercase;white-space:nowrap}
+.b-mcp{background:rgba(0,255,136,0.1);color:var(--green);border:1px solid rgba(0,255,136,0.22)}
+.b-skill{background:rgba(176,112,255,0.1);color:var(--purple);border:1px solid rgba(176,112,255,0.22)}
+.b-official{background:rgba(0,224,255,0.08);color:var(--cyan);border:1px solid rgba(0,224,255,0.18)}
+.b-community{background:rgba(255,255,255,0.05);color:var(--text-dim);border:1px solid rgba(255,255,255,0.08)}
+.b-beg{background:rgba(0,255,136,0.07);color:#44cc88;border:1px solid rgba(0,255,136,0.14)}
+.b-int{background:rgba(255,170,64,0.09);color:var(--amber);border:1px solid rgba(255,170,64,0.18)}
+.b-adv{background:rgba(255,64,96,0.09);color:var(--red);border:1px solid rgba(255,64,96,0.18)}
+.card-name{font-family:var(--mono);font-size:15px;font-weight:600;margin-bottom:3px;color:var(--text)}
+.card-nameja{font-size:12px;color:var(--text-sub);margin-bottom:10px;font-weight:300}
+.card-desc{font-size:13px;color:var(--text-sub);line-height:1.72;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.card-tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:11px;color:var(--text-dim);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:4px;padding:2px 7px}
+.card-foot{display:flex;align-items:center;justify-content:space-between;margin-top:15px;padding-top:13px;border-top:1px solid var(--border)}
+.card-cat{font-size:11px;color:var(--text-dim);font-family:var(--mono)}
+.card-cta{font-family:var(--mono);font-size:11px;color:var(--cyan);opacity:0.6;transition:opacity var(--ease)}
+.card:hover .card-cta{opacity:1}
+
+/* ── EMPTY ── */
+.empty{grid-column:1/-1;text-align:center;padding:80px 20px;color:var(--text-sub)}
+.empty-ico{font-size:44px;margin-bottom:14px}
+.empty-t{font-family:var(--mono);font-size:17px;margin-bottom:8px}
+.empty-d{font-size:13px;color:var(--text-dim)}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(6,8,16,0.82);backdrop-filter:blur(10px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity 0.2s ease}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{background:#0d1022;border:1px solid rgba(0,224,255,0.14);border-radius:16px;width:100%;max-width:700px;max-height:86vh;overflow-y:auto;transform:scale(0.94) translateY(18px);transition:transform 0.22s cubic-bezier(0.34,1.4,0.64,1);position:relative}
+.overlay.open .modal{transform:none}
+.modal::-webkit-scrollbar{width:3px}
+.modal::-webkit-scrollbar-thumb{background:rgba(0,224,255,0.18);border-radius:2px}
+.mhead{padding:26px 26px 18px;border-bottom:1px solid rgba(255,255,255,0.06);position:sticky;top:0;background:#0d1022;z-index:10}
+.mhead-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.m-icon{font-size:34px}
+.m-close{background:rgba(255,255,255,0.06);border:none;color:var(--text-sub);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;transition:all var(--ease);flex-shrink:0;line-height:1}
+.m-close:hover{background:rgba(255,64,64,0.18);color:#ff5050}
+.m-title{font-family:var(--mono);font-size:21px;font-weight:600;margin:11px 0 3px}
+.m-titleja{font-size:13px;color:var(--text-sub);font-weight:300;margin-bottom:12px}
+.m-badges{display:flex;gap:7px;flex-wrap:wrap}
+.mbody{padding:22px 26px 28px}
+.m-desc{font-size:14px;color:var(--text-sub);line-height:1.82;margin-bottom:22px}
+.sec-title{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.12em;color:var(--cyan);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.sec-title::after{content:'';flex:1;height:1px;background:rgba(0,224,255,0.14)}
+.uc-list{list-style:none;margin-bottom:22px}
+.uc-list li{font-size:13px;color:var(--text-sub);padding:7px 0;display:flex;align-items:flex-start;gap:8px;border-bottom:1px solid rgba(255,255,255,0.04);line-height:1.5}
+.uc-list li::before{content:'→';color:var(--cyan);font-family:var(--mono);font-size:11px;margin-top:1px;flex-shrink:0}
+.req-wrap{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:22px}
+.req{font-family:var(--mono);font-size:11px;padding:4px 10px;background:rgba(255,170,64,0.09);border:1px solid rgba(255,170,64,0.18);color:var(--amber);border-radius:6px}
+.steps-wrap{margin-bottom:22px}
+.step{display:flex;gap:14px;margin-bottom:18px}
+.step-n{width:27px;height:27px;background:rgba(0,224,255,0.09);border:1px solid rgba(0,224,255,0.22);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:600;color:var(--cyan);flex-shrink:0;margin-top:1px}
+.step-c{flex:1;min-width:0}
+.step-t{font-size:14px;font-weight:500;margin-bottom:5px;color:var(--text)}
+.step-d{font-size:12px;color:var(--text-sub);margin-bottom:8px;line-height:1.65}
+.codeblock{background:#060810;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:13px 14px;position:relative;font-family:var(--mono);font-size:12px;color:#c8d8f0;line-height:1.65;overflow-x:auto;margin-top:6px}
+.codeblock pre{white-space:pre;margin:0;word-break:break-all;white-space:pre-wrap}
+.copybtn{position:absolute;top:8px;right:8px;background:rgba(0,224,255,0.09);border:1px solid rgba(0,224,255,0.18);color:var(--cyan);border-radius:6px;padding:4px 11px;font-family:var(--mono);font-size:10px;cursor:pointer;transition:all var(--ease);white-space:nowrap;z-index:2}
+.copybtn:hover{background:rgba(0,224,255,0.18)}
+.copybtn.ok{background:rgba(0,255,136,0.12);border-color:rgba(0,255,136,0.25);color:var(--green)}
+.config-note{font-size:11px;color:var(--text-dim);margin:6px 0 22px;line-height:1.55}
+
+/* ── FOOTER ── */
+footer{text-align:center;padding:32px 0 48px;border-top:1px solid var(--border);margin-top:8px;position:relative;z-index:1}
+footer p{font-family:var(--mono);font-size:11px;color:var(--text-dim);line-height:2}
+footer a{color:var(--cyan);text-decoration:none;opacity:0.7;transition:opacity var(--ease)}
+footer a:hover{opacity:1}
+
+/* ── ANIMS ── */
+@keyframes fid{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.09);border-radius:3px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  .wrap{padding:0 16px}
+  header{padding:44px 0 32px}
+  h1{font-size:28px}
+  .grid{grid-template-columns:1fr}
+  .modal{max-height:90vh;border-radius:16px 16px 0 0}
+  .overlay{align-items:flex-end;padding:0}
+  .hstats{flex-wrap:wrap;gap:12px}
+  .frow{gap:10px}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <!-- HEADER -->
+  <header>
+    <div class="hbadge">Claude Code Hub &nbsp;·&nbsp; v1.0</div>
+    <h1>MCP & <em>スキル</em><br>ディレクトリ</h1>
+    <p class="hdesc">Claude Codeを拡張するツールを探して、コピペで簡単に導入。<br>初心者から上級者まで使える無料ツール集。</p>
+    <div class="hstats" id="hstats"></div>
+    <div class="search-wrap">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="例：GitHub、ファイル操作、ブラウザ自動化..." autocomplete="off" spellcheck="false">
+      <button class="search-clear" id="clearBtn" title="クリア">✕</button>
+    </div>
+  </header>
+
+  <!-- FILTERS -->
+  <div class="filters">
+    <div class="frow">
+      <span class="flabel">種類</span>
+      <div class="chips" id="typeChips">
+        <button class="chip active" data-v="all">すべて</button>
+        <button class="chip tmcp" data-v="mcp">MCP</button>
+        <button class="chip tskill" data-v="skill">スキル</button>
+      </div>
+    </div>
+    <div class="frow">
+      <span class="flabel">カテゴリ</span>
+      <div class="chips" id="catChips"></div>
+    </div>
+    <div class="frow">
+      <span class="flabel">難易度</span>
+      <div class="chips" id="diffChips">
+        <button class="chip active" data-v="all">すべて</button>
+        <button class="chip" data-v="beginner">🟢 初級</button>
+        <button class="chip" data-v="intermediate">🟡 中級</button>
+        <button class="chip" data-v="advanced">🔴 上級</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS BAR -->
+  <div class="rbar">
+    <span class="rcount"><span id="rnum">0</span>件のツールが見つかりました</span>
+  </div>
+
+  <!-- GRID -->
+  <div class="grid" id="grid"></div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>Claude Code Hub — 公式MCPサーバーは <a href="https://github.com/modelcontextprotocol/servers" target="_blank">modelcontextprotocol/servers</a> で管理されています</p>
+    <p>Claude Code公式ドキュメント: <a href="https://docs.anthropic.com/claude-code" target="_blank">docs.anthropic.com/claude-code</a></p>
+  </footer>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal">
+    <div class="mhead">
+      <div class="mhead-row">
+        <span class="m-icon" id="mIcon"></span>
+        <button class="m-close" id="mClose">✕</button>
+      </div>
+      <div class="m-title" id="mTitle"></div>
+      <div class="m-titleja" id="mTitleJa"></div>
+      <div class="m-badges" id="mBadges"></div>
+    </div>
+    <div class="mbody" id="mBody"></div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════════
+const ITEMS = [
+
+// ── MCP ─────────────────────────────────────────
+{
+  id:'filesystem', type:'mcp', icon:'📁',
+  name:'Filesystem', nameJa:'ファイルシステム操作',
+  description:'Claudeからローカルファイルの読み書き・ディレクトリ操作を直接実行。許可フォルダを指定して安全に管理できます。APIキー不要ですぐ使えます。',
+  category:'ファイル操作', difficulty:'beginner', official:true,
+  tags:['ファイル','ディレクトリ','ローカル','読み書き'],
+  useCases:['ファイルの作成・読み取り・更新・削除','ディレクトリの作成と一覧表示','複数ファイルの一括処理','プロジェクトのファイル自動整理'],
+  requirements:['Node.js 18+'],
+  steps:[
+    {title:'導入コマンドを実行',desc:'/your/path を許可したいフォルダのパスに変更してください（例：~/Desktop）',
+     code:'claude mcp add filesystem -- npx -y @modelcontextprotocol/server-filesystem /your/path'},
+    {title:'動作確認',desc:'Claude Codeを再起動し、「/mcp」と入力してfilesystemが表示されれば完了です。'}
+  ],
+  configExample:`{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/Users/あなたのユーザー名/Desktop"
+      ]
+    }
+  }
+}`
+},
+
+{
+  id:'fetch', type:'mcp', icon:'🌐',
+  name:'Fetch', nameJa:'Webページ取得',
+  description:'URLを指定してWebページの内容をMarkdown形式で取得します。APIキー不要・設定ゼロで即使えます。ドキュメント参照や情報収集に最適。',
+  category:'Web検索・取得', difficulty:'beginner', official:true,
+  tags:['Fetch','Webページ','URL','Markdown'],
+  useCases:['Webページの内容を読み取り','ドキュメントサイトの参照','APIリファレンスの確認','Webからのデータ抽出'],
+  requirements:['Node.js 18+'],
+  steps:[
+    {title:'導入コマンドを実行（APIキー不要）',desc:'そのまま実行できます',
+     code:'claude mcp add fetch -- npx -y @modelcontextprotocol/server-fetch'}
+  ],
+  configExample:`{
+  "mcpServers": {
+    "fetch": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-fetch"]
+    }
+  }
+}`
+},
+
+{
+  id:'brave-search', type:'mcp', icon:'🔍',
+  name:'Brave Search', nameJa:'Web検索（Brave）',
+  description:'ClaudeからリアルタイムでWeb検索を実行。Brave Search APIの無料プランで月2,000回まで使えます。最新情報への対応に必須。',
+  category:'Web検索・取得', difficulty:'beginner', official:true,
+  tags:['検索','Web','リアルタイム','Brave'],
+  useCases:['最新情報のリアルタイム検索','技術ドキュメントの調査','ニュース・トレンドの把握','情報収集の自動化'],
+  requirements:['Node.js 18+','Brave Search APIキー（無料枠あり）'],
+  steps:[
+    {title:'Brave Search APIキーを取得',desc:'api.search.brave.com でアカウント作成 → APIキーを発行（月2,000回まで無料）'},
+    {title:'導入コマンドを実行',desc:'YOUR_API_KEY を取得したキーに置き換えてください',
+     code:'BRAVE_API_KEY=YOUR_API_KEY claude mcp add brave-search -- npx -y @modelcontextprotocol/server-brave-search'}
+  ],
+  configExample:`{
+  "mcpServers": {
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "env": {
+        "BRAVE_API_KEY": "BSA_xxxxxxxxxxxxx"
+      }
+    }
+  }
+}`
+},
+
+{
+  id:'exa', type:'mcp', icon:'🔎',
+  name:'Exa Search', nameJa:'Exa AI検索',
+  description:'AI特化型の高品質Web検索。技術ドキュメント・論文・コードの検索精度が高く、開発者に人気。無料クレジットで始められます。',
+  category:'Web検索・取得', difficulty:'beginner', official:false,
+  tags:['検索','AI','Exa','高精度'],
+  useCases:['技術ドキュメントの高精度検索','論文・研究成果の調査','コードサンプルの検索','最新技術情報の収集'],
+  requirements:['Node.js 18+','Exa APIキー（無料クレジットあり）'],
+  steps:[
+    {title:'Exa APIキーを取得',desc:'exa.ai でアカウント作成し、APIキーを取得してください（無料クレジットで開始できます）'},
+    {title:'導入コマンドを実行',desc:'YOUR_KEY を取得したキーに置き換えてください',
+     code:'EXA_API_KEY=YOUR_KEY claude mcp add exa -- npx -y exa-mcp-server'}
+  ],
+  configExample:`{
+  "mcpServers": {
+    "exa": {
+      "command": "npx",
+      "args": ["-y", "exa-mcp-server"],
+      "env": {
+        "EXA_API_KEY": "xxxxxxxxxxxxx"
+      }
+    }
+  }
+}`
+},
+
+{
+  id:'github', type:'mcp', icon:'🐙',
+  name:'GitHub', nameJa:'GitHub連携',
+  description:'IssueやPRの操作、コードの検索・参照をClaude Codeから直接行えます。GitHubアカウントのPersonal Access Tokenが必要です。',
+  category:'バージョン管理', difficulty:'beginner', official:true,
+  tags:['GitHub','Issue','PR','リポジトリ'],
+  useCases:['IssueやPRの作成・管理','リポジトリのコード検索','ファイルの読み取り・コミット','GitHubワークフローの自動化'],
+  requirements:['Node.js 18+','GitHubアカウント','Personal Access Token'],
+  steps:[
+    {title:'GitHub Personal Access Tokenを取得',desc:'GitHub → Settings → Developer settings → Personal access tokens → Generate new token（repo スコープを付与）'},
+    {title:'導入コマンドを実行',desc:'YOUR_TOKEN を取得したトークンに置き換えてください',
+     code:'GITHUB_PERSONAL_ACCESS_TOKEN=YOUR_TOKEN claude mcp add github -- npx -y @modelcontextprotocol/server-github'},
+    {title:'動作確認',desc:'Claude Codeを再起動し、「GitHubのIssueを見せて」などと試してみてください'}
+  ],
+  configExample:`{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "ghp_xxxxxxxxxxxx"
+      }
+    }
+  }
+}`
+},
+
+{
+  id:'gitlab', type:'mcp', icon:'🦊',
+  name:'GitLab', nameJa:'GitLab連携',
+  description:'GitLabのIssue・MR（マージリクエスト）をClaude Codeから操作。プロジェクト管理を効率化できます。',
+  category:'バージョン管理', difficulty:'beginner', official:true,
+  tags:['GitLab','Issue','MR','CI/CD'],
+  useCases:['Issueの作成・管理','マージリクエストのレビュー','コードの検索・参照','CI/CDパイプラインの確認'],
+  requirements:['Node.js 18+','GitLabアカウント','Personal Access Token'],
+  steps:[
+    {title:'GitLab Personal Access Tokenを取得',desc:'GitLab → User Settings → Access Tokens → Generate（api, read_repository スコープ）'},
+    {title:'導入コマンドを実行',desc:'YOUR_TOKEN を取得したトークンに置き換えてください',
+     code:'GITLAB_PERSONAL_ACCESS_TOKEN=YOUR_TOKEN claude mcp add gitlab -- npx -y @modelcontextprotocol/server-gitlab'}
+  ],
+  configExample:`{
+  "mcpServers": {
+    "gitlab": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-gitlab"],
+      "env": {
+        "GITLAB_PERSONAL_ACCESS_TOKEN": "glpat-xxxxxxxxxxxx",
+        "GITLAB_API_URL": "https://gitlab.com/api/v4"
+      }
+    }
+  }
+}`
+},
+
+{
+  id:'sqlite', type:'mcp', icon:'🗄️',
+  name:'SQLite', nameJa:'SQLiteデータベース',
+  description:'SQLiteデータベースにClaude Codeから直接アクセス。SQLクエリを実行してデータを操作・分析できます。APIキー不要。',
+  category:'データベース', difficulty:'beginner', official:true,
+  tags:['SQLite','データベース','SQL','クエリ'],
+  useCases:['SQLiteデータベースのCRUD操作','データ分析・集計クエリの実行','テーブル設計の支援','データのインポート・エクスポート'],
+  requirements:['Node.js 18+','SQLiteファイル（なければ自動作成）'],
+  steps:[
+    {title:'導入コマンドを実行',desc:'/path/to/database.db をデータベースファイルのパスに変更（存在しない場合は新規作成されます）',
+     code:'claude mcp add sqlite -- npx -y @modelcontextprotocol/server-sqlite /path/to/database.db'}
+  ],
+  configExample:`{
+  "mcpServers": {
+    "sqlite": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sqlite",
+        "/path/to/your/database.db"
+      ]
+    }
+  }
+}`
+},
+
+{
+  id:'postgres', type:'mcp', icon:'🐘',
+  name:'PostgreSQL', nameJa:'PostgreSQL連携',
+  description:'PostgreSQLデータベースに接続してSQLクエリを実行。スキーマ情報の参照も可能。本格的なDB開発に。',
+  category:'データベース', difficulty:'intermediate', official:true,
+  tags:['PostgreSQL','データベース','SQL','サーバー'],
+  useCases:['PostgreSQLへのSQLクエリ実行','テーブル・スキーマ情報の参照','データの分析・レポート生成','データベース設計の支援'],
+  requirements:['Node.js 18+','PostgreSQLサーバー（ローカルまたはリモート）'],
+  steps:[
+    {title:'導入コマンドを実行',desc:'接続URLはお使いのPostgreSQL設定に合わせてください',
+     code:'claude mcp add postgres -- npx -y @modelcontextprotocol/server-postgres postgresql://localhost/mydb'}
+  ],
+  configExample:`{
+  "mcpServers": {
+    "postgres": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://user:password@localhost:5432/dbname"
+      ]
+    }
+  }
+}`
+},
+
+{
+  id:'memory', type:'mcp', icon:'🧠',
+  name:'Memory', nameJa:'知識グラフメモリ',
+  description:'会話をまたいで記憶を永続化。ユーザー情報・プロジェクト知識を知識グラフとして保存・検索できます。APIキー不要。',
+  category:'AI・思考拡張', difficulty:'beginner', official:true,
+  tags:['メモリ','記憶','知識グラフ','永続化'],
+  useCases:['ユーザー設定や好みの記憶','プロジェクト情報の長期保存','会話履歴を超えた文脈の保持','知識ベースの構築'],
+  requirements:['Node.js 18+'],
+  steps:[
+    {title:'導入コマンドを実行（APIキー不要）',code:'claude mcp add memory -- npx -y @modelcontextprotocol/server-memory'}
+  ],
+  configExample:`{
+  "mcpServers": {
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"]
+    }
+  }
+}`
+},
+
+{
+  id:'sequential-thinking', type:'mcp', icon:'💭',
+  name:'Sequential Thinking', nameJa:'段階的思考プロセス',
+  description:'複雑な問題を段階的に分解して思考するMCP。問題解決の過程を可視化し、より深い分析と計画立案を実現します。',
+  category:'AI・思考拡張', difficulty:'beginner', official:true,
+  tags:['思考','問題解決','分析','プランニング'],
+  useCases:['複雑な問題の段階的な分解','アーキテクチャ設計の検討','リスク分析と意思決定','デバッグの系統的なアプローチ'],
+  requirements:['Node.js 18+'],
+  steps:[
+    {title:'導入コマンドを実行（APIキー不要）',code:'claude mcp add sequential-thinking -- npx -y @modelcontextprotocol/server-sequential-thinking'}
+  ],
+  configExample:`{
+  "mcpServers": {
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+    }
+  }
+}`
+},
+
+{
+  id:'puppeteer', type:'mcp', icon:'🤖',
+  name:'Puppeteer', nameJa:'ブラウザ自動操作',
+  description:'Puppeteerを使ってブラウザをClaude Codeから制御。スクリーンショット取得、フォーム入力、Webスクレイピングなど自動化に活躍。',
+  category:'ブラウザ操作', difficulty:'intermediate', official:true,
+  tags:['Puppeteer','ブラウザ','スクレイピング','自動化'],
+  useCases:['Webページのスクリーンショット取得','フォームの自動入力・送信','Webスクレイピング','E2Eテストの自動化'],
+  requirements:['Node.js 18+','Chrome/Chromium（自動DL）'],
+  steps:[
+    {title:'導入コマンドを実行',code:'claude mcp add puppeteer -- npx -y @modelcontextprotocol/server-puppeteer'},
+    {title:'初回起動時にChromiumが自動ダウンロードされます',desc:'数分かかる場合がありますのでお待ちください'}
+  ],
+  configExample:`{
+  "mcpServers": {
+    "puppeteer": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-puppeteer"]
+    }
+  }
+}`
+},
+
+{
+  id:'slack', type:'mcp', icon:'💬',
+  name:'Slack', nameJa:'Slack連携',
+  description:'SlackのメッセージをClaude Codeから送受信。チャンネルの読み取り・メッセージ投稿・スレッド管理が可能。チーム通知の自動化に。',
+  category:'コミュニケーション', difficulty:'intermediate', official:true,
+  tags:['Slack','メッセージ','チャンネル','通知'],
+  useCases:['Slackメッセージの自動送信','チャンネルメッセージの読み取り','スレッドへの返信自動化','チーム通知の自動化'],
+  requirements:['Node.js 18+','Slackワークスペース','Slack App（Bot Token）'],
+  steps:[
+    {title:'Slack Appを作成',desc:'api.slack.com/apps でアプリを作成 → OAuth & Permissions → Bot Token Scopes に「channels:read」「chat:write」「users:read」を追加 → ワークスペースにインストール'},
+    {title:'導入コマンドを実行',desc:'SLACK_BOT_TOKEN と SLACK_TEAM_ID を取得した値に置き換えてください',
+     code:'SLACK_BOT_TOKEN=xoxb-xxx SLACK_TEAM_ID=Txxxx claude mcp add slack -- npx -y @modelcontextprotocol/server-slack'}
+  ],
+  configExample:`{
+  "mcpServers": {
+    "slack": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-slack"],
+      "env": {
+        "SLACK_BOT_TOKEN": "xoxb-xxxxxxxxxxxx",
+        "SLACK_TEAM_ID": "Txxxxxxxxxx"
+      }
+    }
+  }
+}`
+},
+
+{
+  id:'google-maps', type:'mcp', icon:'🗺️',
+  name:'Google Maps', nameJa:'Google Maps連携',
+  description:'場所の検索、ルート計算、住所のジオコーディングをClaude Codeから実行。位置情報を使ったアプリ開発・データ処理に便利。',
+  category:'地図・位置情報', difficulty:'intermediate', official:true,
+  tags:['地図','ルート','ジオコーディング','Places'],
+  useCases:['住所から緯度経度に変換（ジオコーディング）','2地点間のルート・距離計算','近くのお店・施設の検索','地図情報を使ったデータ処理'],
+  requirements:['Node.js 18+','Google Maps APIキー'],
+  steps:[
+    {title:'Google Maps APIキーを取得',desc:'Google Cloud Console → APIとサービス → Maps JavaScript API・Places API・Directions APIを有効化 → 認証情報でAPIキーを作成'},
+    {title:'導入コマンドを実行',desc:'YOUR_KEY を取得したAPIキーに置き換えてください',
+     code:'GOOGLE_MAPS_API_KEY=YOUR_KEY claude mcp add google-maps -- npx -y @modelcontextprotocol/server-google-maps'}
+  ],
+  configExample:`{
+  "mcpServers": {
+    "google-maps": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-google-maps"],
+      "env": {
+        "GOOGLE_MAPS_API_KEY": "AIzaxxxxxxxxxxxxxxxxxx"
+      }
+    }
+  }
+}`
+},
+
+{
+  id:'notion', type:'mcp', icon:'📝',
+  name:'Notion', nameJa:'Notion連携',
+  description:'NotionのページやデータベースをClaude Codeから操作。コンテンツの読み書き・検索・新規ページ作成が可能。議事録自動化などに。',
+  category:'プロジェクト管理', difficulty:'intermediate', official:false,
+  tags:['Notion','ノート','データベース','ドキュメント'],
+  useCases:['Notionページの読み取り・作成','データベースへのレコード追加','コンテンツの検索・整理','議事録・ドキュメントの自動作成'],
+  requirements:['Node.js 18+','Notionアカウント','Integration Token'],
+  steps:[
+    {title:'Notion Integrationを作成',desc:'notion.so/my-integrations でインテグレーションを作成し、シークレットトークンをコピー'},
+    {title:'Notionページでインテグレーションを共有',desc:'操作したいページを開き、右上「...」→「Connections」→ 作成したインテグレーションを追加'},
+    {title:'導入コマンドを実行',desc:'YOUR_TOKEN を取得したトークンに置き換えてください',
+     code:'NOTION_API_TOKEN=YOUR_TOKEN claude mcp add notion -- npx -y @notionhq/notion-mcp-server'}
+  ],
+  configExample:`{
+  "mcpServers": {
+    "notion": {
+      "command": "npx",
+      "args": ["-y", "@notionhq/notion-mcp-server"],
+      "env": {
+        "NOTION_API_TOKEN": "ntn_xxxxxxxxxxxx"
+      }
+    }
+  }
+}`
+},
+
+{
+  id:'supabase', type:'mcp', icon:'⚡',
+  name:'Supabase', nameJa:'Supabase連携',
+  description:'SupabaseのPostgresデータベース、マイグレーション、プロジェクト設定をClaude Codeから操作できます。モダンなBaaS開発に。',
+  category:'クラウドサービス', difficulty:'intermediate', official:false,
+  tags:['Supabase','PostgreSQL','BaaS','クラウド'],
+  useCases:['Supabaseデータベースの操作','テーブル設計・マイグレーション','プロジェクト設定の確認・変更','RLSポリシーの設定支援'],
+  requirements:['Node.js 18+','Supabaseプロジェクト','Access Token'],
+  steps:[
+    {title:'Supabase Access Tokenを取得',desc:'supabase.com/dashboard → Account → Access Tokens → Generate new token'},
+    {title:'導入コマンドを実行',desc:'YOUR_TOKEN を取得したトークンに置き換えてください',
+     code:'claude mcp add supabase -- npx -y @supabase/mcp-server-supabase --access-token YOUR_TOKEN'}
+  ],
+  configExample:`{
+  "mcpServers": {
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase",
+        "--access-token",
+        "sbp_xxxxxxxxxxxx"
+      ]
+    }
+  }
+}`
+},
+
+{
+  id:'sentry', type:'mcp', icon:'🚨',
+  name:'Sentry', nameJa:'Sentryエラー追跡',
+  description:'SentryのエラーログをClaude Codeから参照。エラーの詳細・スタックトレース・発生頻度をもとにデバッグを自動支援。',
+  category:'開発・デバッグ', difficulty:'intermediate', official:true,
+  tags:['Sentry','エラー','デバッグ','監視'],
+  useCases:['本番環境のエラーをClaudeで分析','エラーのスタックトレース参照','エラー発生傾向の把握','バグ修正の自動支援'],
+  requirements:['Node.js 18+','Sentryアカウント','Auth Token'],
+  steps:[
+    {title:'Sentry Auth Tokenを取得',desc:'sentry.io → Settings → Auth Tokens → Create New Token（org:read, project:read, event:read スコープ）'},
+    {title:'導入コマンドを実行',desc:'YOUR_TOKEN と YOUR_ORG を置き換えてください',
+     code:'SENTRY_AUTH_TOKEN=YOUR_TOKEN claude mcp add sentry -- npx -y @modelcontextprotocol/server-sentry --org YOUR_ORG'}
+  ],
+  configExample:`{
+  "mcpServers": {
+    "sentry": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sentry",
+        "--org",
+        "your-org-slug"
+      ],
+      "env": {
+        "SENTRY_AUTH_TOKEN": "sntrys_xxxxxxxxxxxx"
+      }
+    }
+  }
+}`
+},
+
+// ── Skills ──────────────────────────────────────
+{
+  id:'init', type:'skill', icon:'📋',
+  name:'init', nameJa:'CLAUDE.md 初期化',
+  description:'プロジェクトのCLAUDE.mdファイルを自動生成します。コードベースを分析してClaudeが理解しやすいドキュメントを作成。新規プロジェクト開始時の必須コマンド。',
+  category:'設定・カスタマイズ', difficulty:'beginner', official:true,
+  tags:['CLAUDE.md','初期設定','ドキュメント','プロジェクト'],
+  useCases:['プロジェクト開始時のCLAUDE.md作成','コードベースの自動分析・文書化','チームへのClaudeルール設定'],
+  requirements:['Claude Code（組み込み済み・追加インストール不要）'],
+  steps:[
+    {title:'プロジェクトのフォルダでClaude Codeを開き、コマンドを入力',code:'/init'},
+    {title:'生成されたCLAUDE.mdを確認・編集',desc:'プロジェクトに合わせて内容をカスタマイズしてください'}
+  ]
+},
+
+{
+  id:'review', type:'skill', icon:'🔍',
+  name:'review', nameJa:'コードレビュー',
+  description:'プルリクエストのコードを詳細にレビュー。バグ・パフォーマンス・セキュリティの観点から多角的に分析・改善提案します。',
+  category:'コード品質', difficulty:'beginner', official:true,
+  tags:['レビュー','PR','コード品質','バグ検出'],
+  useCases:['PRのコードレビュー','バグ・問題点の早期発見','コード品質の改善提案','チームのレビュー工数削減'],
+  requirements:['Claude Code（組み込み済み・追加インストール不要）'],
+  steps:[
+    {title:'Claude Codeでコマンドを入力（PRのURLを指定するか省略可）',code:'/review'},
+    {title:'PRの番号を指定する場合',code:'/review 123'}
+  ]
+},
+
+{
+  id:'security-review', type:'skill', icon:'🔒',
+  name:'security-review', nameJa:'セキュリティレビュー',
+  description:'変更されたコードのセキュリティ問題を徹底的にチェック。OWASP Top 10などの観点から脆弱性を検出して修正案を提示します。',
+  category:'セキュリティ', difficulty:'beginner', official:true,
+  tags:['セキュリティ','脆弱性','OWASP','監査'],
+  useCases:['コードの脆弱性チェック','SQLインジェクション・XSS検出','セキュリティベストプラクティスの確認','コンプライアンス対応の支援'],
+  requirements:['Claude Code（組み込み済み・追加インストール不要）'],
+  steps:[
+    {title:'Claude Codeでコマンドを入力',code:'/security-review'}
+  ]
+},
+
+{
+  id:'claude-api', type:'skill', icon:'🤖',
+  name:'claude-api', nameJa:'Claude API開発支援',
+  description:'Anthropic APIを使ったアプリ開発を専門的に支援。プロンプトキャッシュ・ツール使用・ストリーミングの実装まで、コスト最適化も含めてサポート。',
+  category:'AI開発', difficulty:'intermediate', official:true,
+  tags:['Claude API','Anthropic','SDK','AI開発'],
+  useCases:['Claude APIを使ったアプリ開発','プロンプトキャッシュの最適化','ツール使用（Function Calling）の実装','コスト最適化・パフォーマンス改善'],
+  requirements:['Claude Code（組み込み済み・追加インストール不要）','Anthropic APIキー（アプリ開発時）'],
+  steps:[
+    {title:'Claude Codeでコマンドを入力',code:'/claude-api'},
+    {title:'開発したいAPIの機能を説明',desc:'Claude APIで作りたいものを自然言語で説明してください'}
+  ]
+},
+
+{
+  id:'frontend-design', type:'skill', icon:'🎨',
+  name:'frontend-design', nameJa:'フロントエンドデザイン',
+  description:'独自性の高いプロダクショングレードのUIを生成。ありきたりなAIデザインを避け、記憶に残るインターフェースをコードで出力します。',
+  category:'フロントエンド', difficulty:'beginner', official:true,
+  tags:['UI','デザイン','フロントエンド','コンポーネント'],
+  useCases:['Webページ・UIコンポーネントの作成','美しいランディングページの生成','ダッシュボード・管理画面の設計','モバイルファーストなUI作成'],
+  requirements:['Claude Code（組み込み済み・追加インストール不要）'],
+  steps:[
+    {title:'Claude Codeでコマンドを入力',code:'/frontend-design'},
+    {title:'作りたいUIの要件を説明',desc:'目的・対象ユーザー・デザインの方向性などを伝えてください'}
+  ]
+},
+
+{
+  id:'simplify', type:'skill', icon:'✨',
+  name:'simplify', nameJa:'コード簡素化',
+  description:'変更されたコードを見直して、再利用・品質・効率性の問題を検出して自動修正します。コードレビューの前に使うとより効果的。',
+  category:'コード品質', difficulty:'beginner', official:true,
+  tags:['リファクタリング','品質','コード改善','クリーンコード'],
+  useCases:['コードのリファクタリング','重複コードの排除','パフォーマンスの改善','コードの可読性向上'],
+  requirements:['Claude Code（組み込み済み・追加インストール不要）'],
+  steps:[
+    {title:'コードを変更後、コマンドを実行',code:'/simplify'}
+  ]
+},
+
+{
+  id:'schedule', type:'skill', icon:'⏰',
+  name:'schedule', nameJa:'スケジュール実行',
+  description:'指定した時刻や定期的なスケジュールでClaudeエージェントを実行。毎朝のレポート生成やPR確認など繰り返し作業を自動化できます。',
+  category:'自動化・スケジュール', difficulty:'intermediate', official:true,
+  tags:['スケジュール','自動化','cron','定期実行'],
+  useCases:['毎日のレポート自動生成','GitHubのPR確認の定期実行','特定時刻にリマインダー送信','バッチ処理の自動化'],
+  requirements:['Claude Code（組み込み済み・追加インストール不要）'],
+  steps:[
+    {title:'Claude Codeでコマンドを入力',code:'/schedule'},
+    {title:'スケジュールの内容を自然言語で説明',desc:'例：「毎朝9時にGitHubのIssueを確認して要約を表示して」'}
+  ]
+},
+
+{
+  id:'loop', type:'skill', icon:'🔄',
+  name:'loop', nameJa:'ループ実行',
+  description:'指定した間隔でコマンドを繰り返し実行。ビルドの監視・デプロイ状態のポーリングなど、継続的な確認作業を自動化します。',
+  category:'自動化・スケジュール', difficulty:'intermediate', official:true,
+  tags:['ループ','監視','ポーリング','繰り返し'],
+  useCases:['ビルド状態の定期監視','デプロイ完了の自動確認','テスト結果の継続的チェック','APIの状態変化の監視'],
+  requirements:['Claude Code（組み込み済み・追加インストール不要）'],
+  steps:[
+    {title:'Claude Codeでコマンドを入力（間隔とコマンドを指定）',code:'/loop 5m /review'},
+    {title:'間隔を省略すると自動でペース調整',code:'/loop'}
+  ]
+},
+
+{
+  id:'update-config', type:'skill', icon:'⚙️',
+  name:'update-config', nameJa:'設定・フック管理',
+  description:'Claude Codeのsettings.jsonを自然言語で設定。自動実行フック・パーミッション・環境変数などを「〜して」と伝えるだけで設定できます。',
+  category:'設定・カスタマイズ', difficulty:'beginner', official:true,
+  tags:['設定','フック','パーミッション','settings.json'],
+  useCases:['自動実行フックの設定','コマンドパーミッションの管理','環境変数の設定','保存時に自動lintなどの自動化'],
+  requirements:['Claude Code（組み込み済み・追加インストール不要）'],
+  steps:[
+    {title:'Claude Codeでコマンドを入力',code:'/update-config'},
+    {title:'設定したい内容を自然言語で説明',desc:'例：「npmコマンドを許可して」「保存時に自動でlintを実行して」'}
+  ]
+},
+
+{
+  id:'fewer-permission-prompts', type:'skill', icon:'🛡️',
+  name:'fewer-permission-prompts', nameJa:'パーミッションプロンプト削減',
+  description:'頻繁に使用するコマンドへのパーミッション確認を自動で設定し、作業の中断を大幅に減らします。開発フローのスムーズ化に効果的。',
+  category:'設定・カスタマイズ', difficulty:'beginner', official:true,
+  tags:['パーミッション','効率化','設定','確認プロンプト'],
+  useCases:['よく使うコマンドの自動許可設定','開発フローの中断を減らす','settings.jsonへの許可リスト追加'],
+  requirements:['Claude Code（組み込み済み・追加インストール不要）'],
+  steps:[
+    {title:'Claude Codeでコマンドを入力',code:'/fewer-permission-prompts'},
+    {title:'自動で許可リストを設定',desc:'過去の会話を分析して、安全に許可できるコマンドを自動でsettings.jsonに追記します'}
+  ]
+},
+
+{
+  id:'keybindings-help', type:'skill', icon:'⌨️',
+  name:'keybindings-help', nameJa:'キーバインド設定',
+  description:'Claude Codeのキーボードショートカットをカスタマイズ。送信キー・補完・コードブロックの挿入など、自分好みの操作感に変更できます。',
+  category:'設定・カスタマイズ', difficulty:'beginner', official:true,
+  tags:['キーバインド','ショートカット','カスタマイズ','キーボード'],
+  useCases:['Enterキーの動作変更（改行 vs 送信）','カスタムショートカットの追加','コードブロック挿入の設定','ワークフローの効率化'],
+  requirements:['Claude Code（組み込み済み・追加インストール不要）'],
+  steps:[
+    {title:'Claude Codeでコマンドを入力',code:'/keybindings-help'},
+    {title:'変更したいキー設定を説明',desc:'例：「Ctrl+Enterで送信したい」「Enterで改行したい」'}
+  ]
+}
+
+]; // end ITEMS
+
+// ════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════
+const S = { q:'', type:'all', cat:'all', diff:'all' };
+
+// ════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════
+const dlabel = d => ({beginner:'🟢 初級', intermediate:'🟡 中級', advanced:'🔴 上級'}[d] || d);
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+function filtered() {
+  const q = S.q.toLowerCase();
+  return ITEMS.filter(it => {
+    if (S.type !== 'all' && it.type !== S.type) return false;
+    if (S.cat !== 'all' && it.category !== S.cat) return false;
+    if (S.diff !== 'all' && it.difficulty !== S.diff) return false;
+    if (q) {
+      const hay = [it.name, it.nameJa, it.description, it.category,
+        ...(it.tags||[]), ...(it.useCases||[])].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+// ════════════════════════════════════════════════
+// CATEGORIES
+// ════════════════════════════════════════════════
+function buildCatFilter() {
+  const cats = [...new Set(ITEMS.map(i => i.category))].sort();
+  const el = document.getElementById('catChips');
+  el.innerHTML = `<button class="chip active" data-v="all">すべて</button>` +
+    cats.map(c => `<button class="chip" data-v="${esc(c)}">${esc(c)}</button>`).join('');
+  bindChips('catChips', 'cat');
+}
+
+// ════════════════════════════════════════════════
+// RENDER GRID
+// ════════════════════════════════════════════════
+function renderGrid() {
+  const items = filtered();
+  document.getElementById('rnum').textContent = items.length;
+  const grid = document.getElementById('grid');
+
+  if (!items.length) {
+    grid.innerHTML = `<div class="empty"><div class="empty-ico">🔍</div>
+      <div class="empty-t">見つかりませんでした</div>
+      <div class="empty-d">キーワードやフィルターを変えてみてください</div></div>`;
+    return;
+  }
+
+  grid.innerHTML = items.map((it, i) => `
+    <div class="card" data-id="${it.id}" style="animation-delay:${Math.min(i,12)*35}ms">
+      <div class="card-top">
+        <span class="card-icon">${it.icon}</span>
+        <div class="card-badges">
+          <span class="badge ${it.type==='mcp'?'b-mcp':'b-skill'}">${it.type==='mcp'?'MCP':'スキル'}</span>
+          <span class="badge ${it.official?'b-official':'b-community'}">${it.official?'公式':'コミュニティ'}</span>
+          <span class="badge ${{beginner:'b-beg',intermediate:'b-int',advanced:'b-adv'}[it.difficulty]||''}">${dlabel(it.difficulty)}</span>
+        </div>
+      </div>
+      <div class="card-name">${esc(it.name)}</div>
+      <div class="card-nameja">${esc(it.nameJa)}</div>
+      <div class="card-desc">${esc(it.description)}</div>
+      <div class="card-tags">${(it.tags||[]).slice(0,4).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
+      <div class="card-foot">
+        <span class="card-cat">${esc(it.category)}</span>
+        <span class="card-cta">詳細・導入手順 →</span>
+      </div>
+    </div>`).join('');
+
+  grid.querySelectorAll('.card').forEach(c =>
+    c.addEventListener('click', () => openModal(c.dataset.id)));
+}
+
+// ════════════════════════════════════════════════
+// MODAL
+// ════════════════════════════════════════════════
+let currentItem = null;
+
+function openModal(id) {
+  const it = ITEMS.find(i => i.id === id);
+  if (!it) return;
+  currentItem = it;
+
+  document.getElementById('mIcon').textContent = it.icon;
+  document.getElementById('mTitle').textContent = it.name;
+  document.getElementById('mTitleJa').textContent = it.nameJa;
+  document.getElementById('mBadges').innerHTML = `
+    <span class="badge ${it.type==='mcp'?'b-mcp':'b-skill'}">${it.type==='mcp'?'MCP':'スキル'}</span>
+    <span class="badge ${it.official?'b-official':'b-community'}">${it.official?'公式':'コミュニティ'}</span>
+    <span class="badge ${{beginner:'b-beg',intermediate:'b-int',advanced:'b-adv'}[it.difficulty]||''}">${dlabel(it.difficulty)}</span>`;
+
+  let html = `<p class="m-desc">${esc(it.description)}</p>`;
+
+  if (it.useCases?.length) {
+    html += `<div class="sec-title">活用シーン</div>
+      <ul class="uc-list">${it.useCases.map(u=>`<li>${esc(u)}</li>`).join('')}</ul>`;
+  }
+
+  if (it.requirements?.length) {
+    html += `<div class="sec-title">前提条件</div>
+      <div class="req-wrap">${it.requirements.map(r=>`<span class="req">${esc(r)}</span>`).join('')}</div>`;
+  }
+
+  if (it.steps?.length) {
+    html += `<div class="sec-title">導入手順</div><div class="steps-wrap">`;
+    it.steps.forEach((st, idx) => {
+      html += `<div class="step">
+        <div class="step-n">${idx+1}</div>
+        <div class="step-c">
+          <div class="step-t">${esc(st.title)}</div>
+          ${st.desc ? `<div class="step-d">${esc(st.desc)}</div>` : ''}
+          ${st.code ? `<div class="codeblock">
+            <button class="copybtn" data-type="step" data-idx="${idx}">コピー</button>
+            <pre>${esc(st.code)}</pre></div>` : ''}
+        </div></div>`;
+    });
+    html += `</div>`;
+  }
+
+  if (it.configExample) {
+    html += `<div class="sec-title">設定ファイル例（~/.claude/settings.json）</div>
+      <div class="codeblock">
+        <button class="copybtn" data-type="config">コピー</button>
+        <pre>${esc(it.configExample)}</pre>
+      </div>
+      <p class="config-note">※ 上記のCLIコマンドで追加すると設定ファイルが自動で更新されます。<br>手動で編集する場合はこの形式を参考にしてください。</p>`;
+  }
+
+  document.getElementById('mBody').innerHTML = html;
+
+  document.getElementById('mBody').querySelectorAll('.copybtn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      let text = '';
+      if (btn.dataset.type === 'step') {
+        text = currentItem.steps[+btn.dataset.idx].code || '';
+      } else if (btn.dataset.type === 'config') {
+        text = currentItem.configExample || '';
+      }
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = '✓ コピー済';
+        btn.classList.add('ok');
+        setTimeout(() => { btn.textContent = orig; btn.classList.remove('ok'); }, 2200);
+      });
+    });
+  });
+
+  const overlay = document.getElementById('overlay');
+  overlay.classList.add('open');
+  document.getElementById('modal').scrollTop = 0;
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ════════════════════════════════════════════════
+// FILTER BINDING
+// ════════════════════════════════════════════════
+function bindChips(elId, stateKey) {
+  document.getElementById(elId).addEventListener('click', e => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    S[stateKey] = chip.dataset.v;
+    document.querySelectorAll(`#${elId} .chip`).forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    renderGrid();
+  });
+}
+
+// ════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════
+// Stats
+const mcpCount = ITEMS.filter(i => i.type==='mcp').length;
+const skillCount = ITEMS.filter(i => i.type==='skill').length;
+document.getElementById('hstats').innerHTML = `
+  <span class="hstat"><strong>${mcpCount}</strong> 個の MCP</span>
+  <span class="hstat" style="color:var(--text-dim)">·</span>
+  <span class="hstat"><strong>${skillCount}</strong> 個のスキル</span>
+  <span class="hstat" style="color:var(--text-dim)">·</span>
+  <span class="hstat"><strong>${ITEMS.filter(i=>i.official).length}</strong> 個が公式</span>`;
+
+buildCatFilter();
+bindChips('typeChips', 'type');
+bindChips('diffChips', 'diff');
+
+document.getElementById('searchInput').addEventListener('input', e => {
+  S.q = e.target.value;
+  document.getElementById('clearBtn').classList.toggle('visible', S.q.length > 0);
+  renderGrid();
+});
+
+document.getElementById('clearBtn').addEventListener('click', () => {
+  document.getElementById('searchInput').value = '';
+  S.q = '';
+  document.getElementById('clearBtn').classList.remove('visible');
+  renderGrid();
+});
+
+document.getElementById('mClose').addEventListener('click', closeModal);
+document.getElementById('overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('overlay')) closeModal();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+renderGrid();
+</script>
+</body>
+</html>
